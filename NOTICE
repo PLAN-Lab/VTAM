@@ -1,14 +1,52 @@
 VTAM
 Copyright 2026 The VTAM Authors
 
-This release contains configuration files and dataset statistics for the
-real-robot experiments of the VTAM paper. They are original work of the VTAM
-authors and are licensed under the Apache License 2.0 (see LICENSE).
+This repository is not under a single license. Every source file carries an
+SPDX license identifier in its header; the summary below says which applies where.
 
-VTAM builds on Genie Envisioner (https://github.com/AgibotTech/Genie-Envisioner)
-and LTX-Video. The training and inference code, to be released later, will
-carry per-file license headers: code from Diffusers / LTX-Video / openpi under
-Apache 2.0, and code from or adapted from Genie Envisioner under
-CC BY-NC-SA 4.0 (non-commercial), as required by that project's license.
-Pretrained weights referenced by these configs (GE_base_fast_v0.1, LTX-Video)
-are not ours to license and are governed by their own terms.
+
+Apache License 2.0
+------------------
+
+Original VTAM work:
+
+    vtam_server.py
+    experiments/eval_xarm.py
+    data/utils/pose_math.py
+    data/utils/relative_action.py
+    configs/
+
+Code from Diffusers, LTX-Video and openpi, which Genie Envisioner
+redistributes under Apache 2.0 (some files modified by the VTAM authors):
+
+    models/ltx_models/
+    models/pipeline/
+    web_infer_utils/openpi_client/
+
+Original copyright notices are retained in those files.
+
+
+CC BY-NC-SA 4.0 -- NonCommercial
+--------------------------------
+
+Genie Envisioner (https://github.com/AgibotTech/Genie-Envisioner) licenses
+everything outside the directories above under CC BY-NC-SA 4.0. Those files
+are redistributed here under the same terms, and so are the VTAM
+modifications of them, because ShareAlike carries forward:
+
+    main.py
+    runner/
+    data/libero_dataset.py, data/utils/statistics.py, data/utils/utils.py
+    models/action_patches/
+    utils/
+    web_infer_utils/MVActor.py, web_infer_utils/server.py
+    web_infer_scripts/
+
+These files may not be used for commercial purposes.
+
+
+Third-party weights
+-------------------
+
+GE_base_fast_v0.1 and the LTX-Video components referenced by the configs are
+not distributed here and are governed by their own license terms.

@@ -9,10 +9,66 @@ a light flow-force proxy computed from tactile optical flow.
 
 ## Release status
 
-- [x] Real-robot experiment configs and dataset statistics (this release)
-- [ ] Training and inference code
+- [x] Training and inference code
+- [x] Real-robot experiment configs and dataset statistics
+- [x] Real-robot data (xArm6 + GelSight Mini): [JensenYuan/VTAM_xArm_GelSight](https://huggingface.co/datasets/JensenYuan/VTAM_xArm_GelSight)
 - [ ] UniVTAC simulation configs
-- [ ] Checkpoints and datasets
+- [ ] Checkpoints
+
+## Installation
+
+```bash
+git clone https://github.com/PLAN-Lab/VTAM.git
+cd VTAM
+pip install -r requirements.txt
+```
+
+Then fetch the upstream weights the configs expect: the Genie Envisioner video backbone, and the LTX-Video VAE,
+tokenizer and text encoder it is built on.
+
+```bash
+hf download agibot-world/Genie-Envisioner-v1.0 GE_base_fast_v0.1.safetensors --local-dir pretrained_models
+
+hf download Lightricks/LTX-Video --local-dir pretrained_models/ltx_video \
+    --include "model_index.json" "vae/*" "tokenizer/*" "text_encoder/*"
+```
+
+With `<PRETRAINED_ROOT>=pretrained_models` this gives the layout the configs use:
+
+```
+pretrained_models/GE_base_fast_v0.1.safetensors
+pretrained_models/ltx_video/{model_index.json,vae/,tokenizer/,text_encoder/}
+```
+
+`GE_base_fast_v0.1.safetensors` and the LTX-Video components are distributed under their own licenses (the LTX-Video
+Open Weights License), not under this repository's licenses.
+
+## Training
+
+Training reads LeRobot-format datasets. Replace the `<DATA_ROOT>`, `<OUTPUT_ROOT>` and `<PRETRAINED_ROOT>` placeholders
+in a task's configs, then run the two stages (shown for chip pick-and-place; we trained on 4 GPUs):
+
+```bash
+# Stage I: visuo-tactile world-model fine-tuning
+torchrun --nproc_per_node=4 main.py --config_file configs/real_world/chip_pick_and_place/stage1_world_model.yaml
+
+# Stage II: VTAM action learning, warm-started from a Stage I checkpoint (set model_path in the config)
+torchrun --nproc_per_node=4 main.py --config_file configs/real_world/chip_pick_and_place/stage2_vtam.yaml
+```
+
+## Real-robot evaluation
+
+`experiments/eval_xarm.py` runs a trained Stage II model on an xArm6 with RealSense cameras and a GelSight Mini, using a
+task's `deploy_vtam.yaml` (it also needs the [xArm Python SDK](https://github.com/xArm-Developer/xArm-Python-SDK)):
+
+```bash
+python experiments/eval_xarm.py --config_file configs/real_world/chip_pick_and_place/deploy_vtam.yaml \
+    --ckpt_path <stage2 checkpoint> --ip <xArm IP> --use_third --use_gelsight \
+    --prompt "pick up the chip and place it on the plate"
+```
+
+Camera indices (`--base_cam_index`, `--third_cam_index`, `--gelsight_cam_index`) depend on your machine.
+`vtam_server.py` serves a trained model over TCP for remote clients (used for our UniVTAC simulation evaluation).
 
 ## Real-robot configs
 
@@ -45,7 +101,14 @@ Notes:
 
 ## License
 
-The files in this release are under the Apache License 2.0 (see [LICENSE](LICENSE) and [NOTICE](NOTICE)).
+This repository is not under a single license; every source file states its license in its header, and
+[NOTICE](NOTICE) maps it out.
+
+- Original VTAM code, the configs, and the code from Diffusers / LTX-Video / openpi that Genie Envisioner redistributes
+  (`models/ltx_models/`, `models/pipeline/`, `web_infer_utils/openpi_client/`) are under the
+  [Apache License 2.0](LICENSES/Apache-2.0.txt).
+- Files from Genie Envisioner outside those directories, and our modifications of them, stay under
+  [CC BY-NC-SA 4.0](LICENSES/CC-BY-NC-SA-4.0.txt) because of its ShareAlike term, and **may not be used commercially**.
 
 ## Citation
 
