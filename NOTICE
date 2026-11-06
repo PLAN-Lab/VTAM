@@ -1,0 +1,14 @@
+VTAM
+Copyright 2026 The VTAM Authors
+
+This release contains configuration files and dataset statistics for the
+real-robot experiments of the VTAM paper. They are original work of the VTAM
+authors and are licensed under the Apache License 2.0 (see LICENSE).
+
+VTAM builds on Genie Envisioner (https://github.com/AgibotTech/Genie-Envisioner)
+and LTX-Video. The training and inference code, to be released later, will
+carry per-file license headers: code from Diffusers / LTX-Video / openpi under
+Apache 2.0, and code from or adapted from Genie Envisioner under
+CC BY-NC-SA 4.0 (non-commercial), as required by that project's license.
+Pretrained weights referenced by these configs (GE_base_fast_v0.1, LTX-Video)
+are not ours to license and are governed by their own terms.
